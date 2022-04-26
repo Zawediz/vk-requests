@@ -16,68 +16,61 @@ class Api:
         """Constructor"""
         self.access_token = str(token)
 
+    def common_method(self, user_id, method, wall_method=False):
+        """general view of the request"""
+        user_id = str(user_id)
+        method = str(method)
+        if wall_method:
+            temp_request = requests.get(
+                "https://api.vk.com/method/" + method + "?owner_id=" +
+                user_id + "&access_token=" +
+                self.access_token + "&v=5.131")
+        else:
+            temp_request = requests.get(
+                "https://api.vk.com/method/" + method + "?user_id=" +
+                user_id + "&access_token=" +
+                self.access_token + "&v=5.131")
+
+        return temp_request.json()['response']
+
     def get_friends(self, user_id):
         """Return a list of friends"""
         method = 'friends.get'
-        user_id = str(user_id)
-        temp_request = requests.get(
-            "https://api.vk.com/method/" + method + "?user_id=" +
-            user_id + "&access_token=" +
-            self.access_token + "&v=5.131")
-        return temp_request.json()['response']['items']
+        return self.common_method(user_id, method)
 
     def get_user(self, user_id):
         """The function of obtaining user information"""
         method = 'users.get'
-        user_id = str(user_id)
-        fields = 'counters, has_photo'
-        temp_request = requests.get("https://api.vk.com/method/" + method + "?user_id=" +
-                                    user_id + '&fields=' + fields + "&access_token=" +
-                                    self.access_token + "&v=5.131")
-        return temp_request.json()['response'][0]
+        return self.common_method(user_id, method)
 
     def get_wall(self, user_id):
         """The function of getting the user's wall"""
         method = 'wall.get'
-        user_id = str(user_id)
-        temp_request = requests.get("https://api.vk.com/method/" + method + "?owner_id=" +
-                                    user_id + "&access_token=" +
-                                    self.access_token + "&v=5.131")
-        return temp_request.json()['response']
+        return self.common_method(user_id, method, wall_method=True)
 
     def get_subscriptions(self, user_id):
         """Return subscriptions"""
         method = 'users.getSubscriptions'
-        user_id = str(user_id)
-        temp_request = requests.get("https://api.vk.com/method/" + method + "?user_id=" +
-                                    user_id + "&access_token=" +
-                                    self.access_token + "&v=5.131")
-        return temp_request.json()['response']
+        return self.common_method(user_id, method)
 
     def get_followers(self, user_id):
         """Return list of followers"""
         method = 'users.getFollowers'
-        user_id = str(user_id)
-        temp_request = requests.get("https://api.vk.com/method/" + method + "?user_id=" +
-                                    user_id + "&access_token=" +
-                                    self.access_token + "&v=5.131")
-        return temp_request.json()['response']
+        return self.common_method(user_id, method)
 
     def get_albums(self, user_id):
         """Return info about user albums"""
         method = 'photos.getAlbums'
-        user_id = str(user_id)
-        temp_request = requests.get("https://api.vk.com/method/" + method + "?user_id=" +
-                                    user_id + "&access_token=" +
-                                    self.access_token + "&v=5.131")
-        return temp_request.json()['response']
+        return self.common_method(user_id, method)
 
 
 # Test class
 ids = [1]
 api = Api(VK_TOKEN)
-method_list = [func for func in dir(api)
-               if callable(getattr(api, func)) and not func.startswith("__")]
+# method_list = [func for func in dir(api)
+#                if callable(getattr(api, func)) and not func.startswith("__")]
+method_list = ['get_albums', 'get_followers', 'get_friends',
+               'get_subscriptions', 'get_user', 'get_wall']
 for i in ids:
     for m in method_list:
         print(m)
